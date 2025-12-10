@@ -1,0 +1,24 @@
+services:
+  localstack:
+    image: localstack/localstack:latest
+    container_name: localstack-aws
+    ports:
+      - "4566:4566"            # LocalStack Gateway
+      - "4510-4559:4510-4559"  # External services port range
+    environment:
+      - SERVICES=s3,lambda
+      - DEBUG=1
+      - DATA_DIR=/tmp/localstack/data
+      - LAMBDA_EXECUTOR=docker
+      - DOCKER_HOST=unix:///var/run/docker.sock
+    volumes:
+      - "./localstack-data:/tmp/localstack"
+      - "/var/run/docker.sock:/var/run/docker.sock"
+      - "./init-aws.sh:/etc/localstack/init/ready.d/init-aws.sh"
+      - "./lambda:/opt/lambda"
+    networks:
+      - aws-local
+
+networks:
+  aws-local:
+    driver: bridge
