@@ -1,8 +1,34 @@
-# IaC Shopping Graph Analysis
+# Infraestructura como Código (IaC) - Shopping Graph Analysis
+
+## Quality Gates & Workflow
+
+This project includes a set of automated Quality Gates located in the `workflow/` directory to run Unit, Integration, and Performance tests.
+
+### Structure
+- **Unit Quality Gate**: `workflow/unit_quality_gate/` - Runs unit tests and coverage (JaCoCo/Pytest).
+- **Integration Quality Gate**: `workflow/integration_quality_gate/` - Validates service interactions.
+- **Performance Quality Gate**: `workflow/performance_quality_gate/` - Runs load tests using Locust.
+
+### How to Run
+```bash
+# Unit Tests
+./workflow/unit_quality_gate/run_tests.sh
+
+# Integration Tests
+./workflow/integration_quality_gate/run_integration_tests.sh
+
+# Performance Tests (requires running app)
+./workflow/performance_quality_gate/run_load_test.sh
+```
+
+### Scalability
+See [SCALABILITY.md](workflow/SCALABILITY.md) for details on EC2 replicability and auto-scaling strategies.
+
+## Project Structure
 
 ## Terraform Modules Structure
 
-This project uses a modular Terraform architecture to manage AWS infrastructure efficiently and reusably.
+This project uses a modular Terraform architecture to manage AWS infrastructure efficiently and reusability.
 
 ### Directory Structure
 
