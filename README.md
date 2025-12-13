@@ -12,7 +12,7 @@ This project includes a set of automated Quality Gates located in the `workflow/
 ### How to Run
 ```bash
 # Unit Tests
-./workflow/unit_quality_gate/run_tests.sh
+./workflow/unit_quality_gate.yaml/run_tests.sh
 
 # Integration Tests
 ./workflow/integration_quality_gate/run_integration_tests.sh
