@@ -44,37 +44,3 @@ module "neo4j" {
   ssh_cidr_blocks   = ["0.0.0.0/0"] # Change to your IP for production
   neo4j_cidr_blocks = ["0.0.0.0/0"] # Change to your VPC CIDR for production
 }
-
-# Outputs
-output "neo4j_instance_id" {
-  description = "EC2 instance ID running Neo4j"
-  value       = module.neo4j.instance_id
-}
-
-output "neo4j_public_ip" {
-  description = "Public IP address of Neo4j instance"
-  value       = module.neo4j.public_ip
-}
-
-output "neo4j_browser_url" {
-  description = "URL to access Neo4j Browser"
-  value       = module.neo4j.neo4j_browser_url
-}
-
-output "neo4j_bolt_url" {
-  description = "Bolt connection URL for applications"
-  value       = module.neo4j.neo4j_bolt_url
-}
-
-output "connection_instructions" {
-  description = "Instructions to connect to Neo4j"
-  value       = <<-EOT
-    Neo4j Browser: ${module.neo4j.neo4j_browser_url}
-    Username: neo4j
-    Password: [the password you set in variables]
-    
-    Bolt URL for applications: ${module.neo4j.neo4j_bolt_url}
-    
-    SSH Access: ssh -i your-key.pem ec2-user@${module.neo4j.public_ip}
-  EOT
-}
