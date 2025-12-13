@@ -4,6 +4,10 @@
 
 This project includes a set of automated Quality Gates located in the `workflow/` directory to run Unit, Integration, and Performance tests.
 
+※**References:**
+https://docs.localstack.cloud/aws/integrations/infrastructure-as-code/terraform/
+
+
 ### Structure
 - **Unit Quality Gate**: `workflow/unit_quality_gate/` - Runs unit tests and coverage (JaCoCo/Pytest).
 - **Integration Quality Gate**: `workflow/integration_quality_gate/` - Validates service interactions.
