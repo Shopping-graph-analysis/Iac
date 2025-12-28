@@ -1,3 +1,3 @@
-key_name="shopping-analysis"
+key_name="shopping-graph"
 neo4j_password="test"
-aws_region = "us-east-1"
+aws_region = "eu-west-1"

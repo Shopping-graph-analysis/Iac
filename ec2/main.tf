@@ -1,9 +1,7 @@
-# Get the default VPC
 data "aws_vpc" "default" {
   default = true
 }
 
-# Get subnets in the default VPC
 data "aws_subnets" "default" {
   filter {
     name   = "vpc-id"
@@ -11,7 +9,6 @@ data "aws_subnets" "default" {
   }
 }
 
-# Get the latest Amazon Linux 2023 AMI
 data "aws_ami" "amazon_linux_2023" {
   most_recent = true
   owners      = ["amazon"]
@@ -27,7 +24,6 @@ data "aws_ami" "amazon_linux_2023" {
   }
 }
 
-# Deploy Neo4j on EC2
 module "neo4j" {
   source = "../modules/ec2"
 
@@ -40,7 +36,6 @@ module "neo4j" {
   neo4j_password = var.neo4j_password
   volume_size    = 30
 
-  # Security: Restrict access in production
-  ssh_cidr_blocks   = ["0.0.0.0/0"] # Change to your IP for production
-  neo4j_cidr_blocks = ["0.0.0.0/0"] # Change to your VPC CIDR for production
+  ssh_cidr_blocks   = ["0.0.0.0/0"]
+  neo4j_cidr_blocks = ["0.0.0.0/0"]
 }
