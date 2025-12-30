@@ -35,11 +35,11 @@ jobs:
           terraform_version: v1.13.2
 
       - name: 'Terraform Init'
-        working-directory: ${{ inputs.tf-path }}
+        working-directory: oidc
         run: terraform init
       
       - name: 'Terraform Plan'
-        working-directory: ${{ inputs.tf-path }}
+        working-directory: oidc
         run: terraform plan -out=tfplan
 
       - name: 'Upload TF Plan'
@@ -47,9 +47,9 @@ jobs:
         with:
           name: tfplan
           path: |
-            ${{ inputs.tf-path }}/tfplan
-            ${{ inputs.tf-path }}/.terraform.lock.hcl
-            ${{ inputs.tf-path }}/.terraform
+            oidc/tfplan
+            oidc/.terraform.lock.hcl
+            oidc/.terraform
           if-no-files-found: error 
 
   apply-tf-plan:
@@ -77,8 +77,8 @@ jobs:
         uses: actions/download-artifact@v4
         with:
           name: tfplan
-          path: ${{ inputs.tf-path }}
+          path: oidc
 
       - name: 'Terraform Apply'
-        working-directory: ${{ inputs.tf-path }}
+        working-directory: oidc
         run: terraform apply -auto-approve tfplan
