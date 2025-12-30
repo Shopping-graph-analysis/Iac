@@ -34,7 +34,7 @@ resource "aws_sqs_queue_policy" "this" {
 
 resource "aws_s3_bucket_notification" "bucket_notification" {
   count  = var.enable_s3_notification ? 1 : 0
-  bucket = aws_s3_bucket.s3_bucket.id
+  bucket = var.s3_bucket_arn
 
   queue {
     queue_arn     = aws_sqs_queue.this.arn
