@@ -1,0 +1,47 @@
+name: 'Terraform Lambda'
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - 'lambda/*'
+      - '.github/workflows/tf-lambda.yaml'
+  workflow_dispatch:
+
+permissions:
+  id-token: write
+  contents: read
+
+
+jobs:
+  tf-lambda:
+    name: 'Terraform Lambda'
+    runs-on: ubuntu-latest
+    steps:
+      - name: 'Checkout repository'
+        uses: actions/checkout@v4
+      
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v5.0.0
+        with:
+          aws-region: ${{ vars.REGION }}
+          role-to-assume: ${{ vars.OIDC_ROLE }}
+          role-session-name: IAM-Github-Actions-TF
+
+      - name: HashiCorp - Setup Terraform
+        uses: hashicorp/setup-terraform@v2.0.3
+        with:
+          terraform_version: v1.13.2
+
+      - name: 'Terraform Init'
+        working-directory: lambda
+        run: terraform init
+      
+      - name: 'Terraform Plan'
+        working-directory: lambda
+        run: terraform plan
+
+      - name: 'Terraform Apply'
+        working-directory: lambda
+        run: terraform apply -auto-approve
