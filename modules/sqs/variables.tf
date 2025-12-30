@@ -39,7 +39,7 @@ variable "enable_s3_notification" {
   default     = false
 }
 
-variable "s3_bucket_arn" {
+variable "s3_bucket_name" {
   description = "ARN of the S3 bucket allowed to send messages"
   type        = string
   default     = ""

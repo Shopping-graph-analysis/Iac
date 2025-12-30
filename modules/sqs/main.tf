@@ -1,3 +1,7 @@
+data "aws_s3_bucket" "ticket_ingestion_bucket" {
+  bucket = var.s3_bucket_name
+}
+
 resource "aws_sqs_queue" "this" {
   name                      = var.queue_name
   delay_seconds             = var.delay_seconds
@@ -24,7 +28,7 @@ resource "aws_sqs_queue_policy" "this" {
         Resource = aws_sqs_queue.this.arn
         Condition = {
           ArnLike = {
-            "aws:SourceArn" = var.s3_bucket_arn
+            "aws:SourceArn" = data.aws_s3_bucket.ticket_ingestion_bucket.arn
           }
         }
       }
@@ -34,7 +38,7 @@ resource "aws_sqs_queue_policy" "this" {
 
 resource "aws_s3_bucket_notification" "bucket_notification" {
   count  = var.enable_s3_notification ? 1 : 0
-  bucket = var.s3_bucket_arn
+  bucket = data.aws_s3_bucket.ticket_ingestion_bucket.id
 
   queue {
     queue_arn     = aws_sqs_queue.this.arn

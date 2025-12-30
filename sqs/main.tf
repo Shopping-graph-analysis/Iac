@@ -15,10 +15,6 @@ locals {
   }
 }
 
-data "aws_s3_bucket" "ticket_ingestion_bucket" {
-  bucket = "s3-ticket-storage"
-}
-
 # ============================================================================
 # SQS Queue for S3 Event Notifications
 # ============================================================================
@@ -33,7 +29,7 @@ module "ticket_ingestion_queue" {
   receive_wait_time_seconds = 10     # Long polling
 
   enable_s3_notification = true
-  s3_bucket_arn          = data.aws_s3_bucket.ticket_ingestion_bucket.arn
+  s3_bucket_name         = "s3-ticket-storage"
 
   tags = local.common_tags
 }
