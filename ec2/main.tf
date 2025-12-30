@@ -32,8 +32,8 @@ module "neo4j" {
   ami_id         = data.aws_ami.amazon_linux_2023.id
   vpc_id         = data.aws_vpc.default.id
   subnet_id      = data.aws_subnets.default.ids[0]
-  key_name       = var.key_name
-  neo4j_password = var.neo4j_password
+  key_name       = "admin"
+  neo4j_password = "admin"
   volume_size    = 30
 
   ssh_cidr_blocks   = ["0.0.0.0/0"]
