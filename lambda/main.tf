@@ -7,7 +7,7 @@ data "archive_file" "lambda" {
 module "event_processor_lambda" {
   source = "../modules/lambda"
 
-  function_name = "lambda_function"
+  function_name = "search_ticket_lambda"
   runtime       = "python3.12"
   handler       = "main.main"
   filename      = data.archive_file.lambda.output_path
