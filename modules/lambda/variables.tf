@@ -63,10 +63,9 @@ variable "enable_sqs_trigger" {
   default     = false
 }
 
-variable "sqs_queue_arn" {
+variable "sqs_queue_name" {
   type        = string
-  description = "ARN of the SQS queue to trigger Lambda"
-  default     = ""
+  description = "Name of the SQS queue to trigger Lambda"
 }
 
 variable "sqs_batch_size" {

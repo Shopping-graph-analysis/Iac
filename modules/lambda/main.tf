@@ -6,6 +6,10 @@ data "aws_s3_bucket" "ticket_ingestion_bucket" {
   bucket = var.s3_bucket_name
 }
 
+data "aws_sqs_queue" "ticket_ingestion_queue" {
+  name = var.sqs_queue_name
+}
+
 data "aws_iam_policy_document" "assume_role" {
   statement {
     effect = "Allow"
@@ -68,7 +72,7 @@ resource "aws_iam_policy" "lambda_sqs_policy" {
           "sqs:DeleteMessage",
           "sqs:GetQueueAttributes"
         ]
-        Resource = var.sqs_queue_arn
+        Resource = data.aws_sqs_queue.ticket_ingestion_queue.arn
       }
     ]
   })
@@ -101,10 +105,9 @@ resource "aws_lambda_function" "lambda_function" {
   tags = var.tags
 }
 
-# SQS Event Source Mapping
 resource "aws_lambda_event_source_mapping" "sqs_trigger" {
   count            = var.enable_sqs_trigger ? 1 : 0
-  event_source_arn = var.sqs_queue_arn
+  event_source_arn = data.aws_sqs_queue.ticket_ingestion_queue.arn
   function_name    = aws_lambda_function.lambda_function.arn
   batch_size       = var.sqs_batch_size
   enabled          = true
