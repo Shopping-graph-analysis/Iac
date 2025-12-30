@@ -33,7 +33,7 @@ module "ticket_ingestion_queue" {
   receive_wait_time_seconds = 10     # Long polling
 
   enable_s3_notification = true
-  s3_bucket_arn          = data.aws_s3_bucket.ticket_ingestion_bucket.id
+  s3_bucket_arn          = data.aws_s3_bucket.ticket_ingestion_bucket.arn
 
   tags = local.common_tags
 }
