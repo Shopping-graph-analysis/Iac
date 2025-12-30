@@ -9,30 +9,14 @@
 
 locals {
   common_tags = {
-    Environment = var.environment
-    Project     = var.project_name
+    Environment = "dev"
+    Project     = "ticket-ingestion"
     ManagedBy   = "Terraform"
   }
 }
 
-# ============================================================================
-# S3 Bucket for Data Ingestion
-# ============================================================================
-
-module "data_ingestion_bucket" {
-  source = "../modules/s3"
-
-  bucket_name       = "s3-ticket-storage"
-  enable_versioning = true
-
-  # Enable S3 event notifications to SQS
-  enable_sqs_notification    = true
-  sqs_queue_arn              = module.ticket_ingestion_queue.queue_arn
-  notification_events        = ["s3:ObjectCreated:*"]
-  notification_filter_prefix = "" # Process all objects
-  notification_filter_suffix = "" # No suffix filter
-
-  tags = local.common_tags
+data "aws_s3_bucket" "ticket_ingestion_bucket" {
+  bucket = "s3-ticket-storage"
 }
 
 # ============================================================================
@@ -48,9 +32,8 @@ module "ticket_ingestion_queue" {
   message_retention_seconds = 345600 # 4 days
   receive_wait_time_seconds = 10     # Long polling
 
-  # Enable S3 to send notifications
   enable_s3_notification = true
-  s3_bucket_arn          = module.data_ingestion_bucket.bucket_arn
+  s3_bucket_arn          = data.aws_s3_bucket.ticket_ingestion_bucket.arn
 
   tags = local.common_tags
 }
