@@ -16,7 +16,7 @@ module "event_processor_lambda" {
   region        = "eu-west-1"
 
   enable_sqs_trigger = true
-  sqs_queue_name     = "sqs-ticket-ingestion-queue"
+  sqs_queue_name     = "ticket-ingestion-queue"
   sqs_batch_size     = 10
 
   enable_s3_access = true
