@@ -111,4 +111,5 @@ resource "aws_lambda_event_source_mapping" "sqs_trigger" {
   function_name    = aws_lambda_function.lambda_function.arn
   batch_size       = var.sqs_batch_size
   enabled          = true
+  depends_on       = [aws_iam_role_policy_attachment.lambda_sqs_policy_attachment]
 }
