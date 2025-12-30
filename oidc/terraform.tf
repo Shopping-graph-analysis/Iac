@@ -9,7 +9,7 @@ terraform {
     bucket       = "tfstate-aws-shopping-graph-analysis"
     key          = "OIDC/OIDC.tfstate"
     region       = "eu-west-1"
-    use_lockfile = true # This enables native S3 state locking
+    use_lockfile = true
   }
 }
 
