@@ -1,3 +1,3 @@
-key_name="shopping-graph"
-neo4j_password="test"
-aws_region = "eu-west-1"
+key_name       = "admin"
+neo4j_password = "admin"
+aws_region     = "eu-west-1"
