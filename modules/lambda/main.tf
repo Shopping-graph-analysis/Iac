@@ -2,6 +2,10 @@ locals {
   role_name = "${var.function_name}_lambda_execution_role"
 }
 
+data "aws_s3_bucket" "ticket_ingestion_bucket" {
+  bucket = var.s3_bucket_name
+}
+
 data "aws_iam_policy_document" "assume_role" {
   statement {
     effect = "Allow"
@@ -20,7 +24,6 @@ resource "aws_iam_role" "lambda_execution_role" {
   assume_role_policy = data.aws_iam_policy_document.assume_role.json
 }
 
-# IAM Policy for Lambda to access S3
 resource "aws_iam_policy" "lambda_s3_policy" {
   count       = var.enable_s3_access ? 1 : 0
   name        = "${var.function_name}_s3_access"
@@ -36,8 +39,8 @@ resource "aws_iam_policy" "lambda_s3_policy" {
           "s3:ListBucket"
         ]
         Resource = [
-          var.s3_bucket_arn,
-          "${var.s3_bucket_arn}/*"
+          data.aws_s3_bucket.ticket_ingestion_bucket.arn,
+          "${data.aws_s3_bucket.ticket_ingestion_bucket.arn}/*"
         ]
       }
     ]
@@ -50,7 +53,6 @@ resource "aws_iam_role_policy_attachment" "lambda_s3_policy_attachment" {
   policy_arn = aws_iam_policy.lambda_s3_policy[0].arn
 }
 
-# IAM Policy for Lambda to consume SQS messages
 resource "aws_iam_policy" "lambda_sqs_policy" {
   count       = var.enable_sqs_trigger ? 1 : 0
   name        = "${var.function_name}_sqs_access"
@@ -78,7 +80,6 @@ resource "aws_iam_role_policy_attachment" "lambda_sqs_policy_attachment" {
   policy_arn = aws_iam_policy.lambda_sqs_policy[0].arn
 }
 
-# Basic Lambda execution policy for CloudWatch Logs
 resource "aws_iam_role_policy_attachment" "lambda_basic_execution" {
   role       = aws_iam_role.lambda_execution_role.name
   policy_arn = "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"

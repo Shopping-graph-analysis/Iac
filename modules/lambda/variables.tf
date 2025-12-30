@@ -81,7 +81,7 @@ variable "enable_s3_access" {
   default     = false
 }
 
-variable "s3_bucket_arn" {
+variable "s3_bucket_name" {
   type        = string
   description = "ARN of the S3 bucket to grant access to"
   default     = ""

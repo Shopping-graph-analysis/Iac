@@ -20,11 +20,11 @@ module "event_processor_lambda" {
   sqs_batch_size     = 10
 
   enable_s3_access = true
-  s3_bucket_arn    = module.data_ingestion_bucket.bucket_arn
+  s3_bucket_name   = "s3-ticket-storage"
 
   env_variables = {
     ENVIRONMENT = "dev"
-    BUCKET_NAME = module.data_ingestion_bucket.bucket_name
+    BUCKET_NAME = "s3-ticket-storage"
   }
 
 }
