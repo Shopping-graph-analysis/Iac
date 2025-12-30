@@ -22,12 +22,12 @@ locals {
 module "data_ingestion_bucket" {
   source = "../modules/s3"
 
-  bucket_name       = var.s3_bucket_name
+  bucket_name       = "s3-ticket-storage"
   enable_versioning = true
 
   # Enable S3 event notifications to SQS
   enable_sqs_notification    = true
-  sqs_queue_arn              = module.event_queue.queue_arn
+  sqs_queue_arn              = module.ticket_ingestion_queue.queue_arn
   notification_events        = ["s3:ObjectCreated:*"]
   notification_filter_prefix = "" # Process all objects
   notification_filter_suffix = "" # No suffix filter
@@ -39,10 +39,10 @@ module "data_ingestion_bucket" {
 # SQS Queue for S3 Event Notifications
 # ============================================================================
 
-module "event_queue" {
+module "ticket_ingestion_queue" {
   source = "../modules/sqs"
 
-  queue_name                = var.sqs_queue_name
+  queue_name                = "ticket-ingestion-queue"
   delay_seconds             = 0
   max_message_size          = 262144 # 256 KB
   message_retention_seconds = 345600 # 4 days
