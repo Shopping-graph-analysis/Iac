@@ -11,7 +11,7 @@ module "event_processor_lambda" {
   runtime       = "python3.12"
   handler       = "main.main"
   filename      = data.archive_file.lambda.output_path
-  timeout       = 60
+  timeout       = 30
   memory_size   = 256
   region        = "eu-west-1"
 
