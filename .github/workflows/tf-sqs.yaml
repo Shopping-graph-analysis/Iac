@@ -1,0 +1,47 @@
+name: 'Terraform SQS'
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - 'sqs/*'
+      - '.github/workflows/tf-sqs.yaml'
+  workflow_dispatch:
+
+permissions:
+  id-token: write
+  contents: read
+
+
+jobs:
+  tf-sqs:
+    name: 'Terraform SQS'
+    runs-on: ubuntu-latest
+    steps:
+      - name: 'Checkout repository'
+        uses: actions/checkout@v4
+      
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v5.0.0
+        with:
+          aws-region: ${{ vars.REGION }}
+          role-to-assume: ${{ vars.OIDC_ROLE }}
+          role-session-name: IAM-Github-Actions-TF
+
+      - name: HashiCorp - Setup Terraform
+        uses: hashicorp/setup-terraform@v2.0.3
+        with:
+          terraform_version: v1.13.2
+
+      - name: 'Terraform Init'
+        working-directory: sqs
+        run: terraform init
+      
+      - name: 'Terraform Plan'
+        working-directory: sqs
+        run: terraform plan
+
+      - name: 'Terraform Apply'
+        working-directory: sqs
+        run: terraform apply -auto-approve
