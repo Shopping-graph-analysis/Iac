@@ -29,6 +29,7 @@ resource "aws_iam_role" "lambda_execution_role" {
 }
 
 resource "aws_iam_policy" "lambda_s3_policy" {
+  depends_on  = [aws_iam_role.lambda_execution_role]
   count       = var.enable_s3_access ? 1 : 0
   name        = "${var.function_name}_s3_access"
   description = "Allow Lambda to read from S3"
@@ -52,12 +53,14 @@ resource "aws_iam_policy" "lambda_s3_policy" {
 }
 
 resource "aws_iam_role_policy_attachment" "lambda_s3_policy_attachment" {
+  depends_on = [aws_iam_policy.lambda_s3_policy]
   count      = var.enable_s3_access ? 1 : 0
   role       = aws_iam_role.lambda_execution_role.name
   policy_arn = aws_iam_policy.lambda_s3_policy[0].arn
 }
 
 resource "aws_iam_policy" "lambda_sqs_policy" {
+  depends_on  = [aws_iam_role.lambda_execution_role]
   count       = var.enable_sqs_trigger ? 1 : 0
   name        = "${var.function_name}_sqs_access"
   description = "Allow Lambda to consume SQS messages"
@@ -66,30 +69,29 @@ resource "aws_iam_policy" "lambda_sqs_policy" {
     Version = "2012-10-17"
     Statement = [
       {
-        Effect = "Allow"
-        Action = [
-          "sqs:ReceiveMessage",
-          "sqs:DeleteMessage",
-          "sqs:GetQueueAttributes"
-        ]
-        Resource = data.aws_sqs_queue.ticket_ingestion_queue.arn
+        Effect   = "Allow"
+        Action   = ["sqs:ReceiveMessage", "sqs:DeleteMessage", "sqs:GetQueueAttributes"]
+        Resource = [data.aws_sqs_queue.ticket_ingestion_queue.arn]
       }
     ]
   })
 }
 
 resource "aws_iam_role_policy_attachment" "lambda_sqs_policy_attachment" {
+  depends_on = [aws_iam_policy.lambda_sqs_policy]
   count      = var.enable_sqs_trigger ? 1 : 0
   role       = aws_iam_role.lambda_execution_role.name
   policy_arn = aws_iam_policy.lambda_sqs_policy[0].arn
 }
 
 resource "aws_iam_role_policy_attachment" "lambda_basic_execution" {
+  depends_on = [aws_iam_role.lambda_execution_role]
   role       = aws_iam_role.lambda_execution_role.name
   policy_arn = "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
 }
 
 resource "aws_lambda_function" "lambda_function" {
+  depends_on    = [aws_iam_role.lambda_execution_role]
   function_name = var.function_name
   role          = aws_iam_role.lambda_execution_role.arn
   runtime       = var.runtime
@@ -111,5 +113,5 @@ resource "aws_lambda_event_source_mapping" "sqs_trigger" {
   function_name    = aws_lambda_function.lambda_function.arn
   batch_size       = var.sqs_batch_size
   enabled          = true
-  depends_on       = [aws_iam_role_policy_attachment.lambda_sqs_policy_attachment]
+  depends_on       = [aws_iam_role_policy_attachment.lambda_sqs_policy_attachment, aws_lambda_function.lambda_function]
 }
