@@ -11,7 +11,6 @@ resource "aws_sqs_queue" "this" {
   tags                      = var.tags
 }
 
-# SQS Queue Policy to allow S3 to send messages
 resource "aws_sqs_queue_policy" "this" {
   count     = var.enable_s3_notification ? 1 : 0
   queue_url = aws_sqs_queue.this.id
