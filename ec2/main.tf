@@ -28,11 +28,11 @@ module "neo4j" {
   source = "../modules/ec2"
 
   project_name   = "shopping-graph"
-  instance_type  = "t3.medium"
+  instance_type  = "t3.micro"
   ami_id         = data.aws_ami.amazon_linux_2023.id
   vpc_id         = data.aws_vpc.default.id
   subnet_id      = data.aws_subnets.default.ids[0]
-  key_name       = "admin"
+  key_name       = "neo4j-key-pair"
   neo4j_password = "admin"
   volume_size    = 30
 

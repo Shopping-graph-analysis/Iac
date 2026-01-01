@@ -25,7 +25,7 @@ variable "subnet_id" {
 }
 
 variable "key_name" {
-  description = "SSH key pair name for instance access"
+  description = "Name for the new SSH key pair to be created"
   type        = string
 }
 

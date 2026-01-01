@@ -69,23 +69,44 @@ resource "aws_iam_role" "neo4j_ec2" {
 
 # Attach CloudWatch policy for logging
 resource "aws_iam_role_policy_attachment" "cloudwatch_logs" {
+  depends_on = [aws_iam_instance_profile.neo4j_ec2]
   role       = aws_iam_role.neo4j_ec2.name
   policy_arn = "arn:aws:iam::aws:policy/CloudWatchAgentServerPolicy"
 }
 
 # IAM Instance Profile
 resource "aws_iam_instance_profile" "neo4j_ec2" {
-  name = "${var.project_name}-neo4j-ec2-profile"
-  role = aws_iam_role.neo4j_ec2.name
+  depends_on = [aws_iam_role.neo4j_ec2]
+  name       = "${var.project_name}-neo4j-ec2-profile"
+  role       = aws_iam_role.neo4j_ec2.name
+}
+
+resource "tls_private_key" "this" {
+  algorithm = "RSA"
+  rsa_bits  = 4096
+}
+
+resource "aws_key_pair" "this" {
+  depends_on = [tls_private_key.this]
+  key_name   = var.key_name
+  public_key = tls_private_key.this.public_key_openssh
+}
+
+resource "local_file" "private_key" {
+  depends_on = [aws_key_pair.this]
+  content         = tls_private_key.this.private_key_pem
+  filename        = "${path.module}/${var.key_name}.pem"
+  file_permission = "0400"
 }
 
 # EC2 Instance for Neo4j
 resource "aws_instance" "neo4j" {
+  depends_on             = [aws_iam_instance_profile.neo4j_ec2, aws_key_pair.this, local_file.private_key]
   ami                    = var.ami_id
   instance_type          = var.instance_type
   subnet_id              = var.subnet_id
   vpc_security_group_ids = [aws_security_group.neo4j.id]
-  key_name               = var.key_name
+  key_name               = aws_key_pair.this.key_name
   iam_instance_profile   = aws_iam_instance_profile.neo4j_ec2.name
 
   root_block_device {
