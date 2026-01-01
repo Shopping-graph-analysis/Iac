@@ -1,3 +1,5 @@
 *.lock.*
 *.tfstate
 .terraform
+*.backup
+.idea
