@@ -1,6 +1,5 @@
 data "aws_lambda_function" "search" {
   function_name = "search_ticket_lambda"
-  region        = "eu-west-1"
 }
 
 module "api_gateway" {
