@@ -66,6 +66,7 @@ variable "enable_sqs_trigger" {
 variable "sqs_queue_name" {
   type        = string
   description = "Name of the SQS queue to trigger Lambda"
+  default     = ""
 }
 
 variable "sqs_batch_size" {

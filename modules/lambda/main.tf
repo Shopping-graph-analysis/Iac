@@ -3,11 +3,13 @@ locals {
 }
 
 data "aws_s3_bucket" "ticket_ingestion_bucket" {
+  count  = var.enable_s3_access ? 1 : 0
   bucket = var.s3_bucket_name
 }
 
 data "aws_sqs_queue" "ticket_ingestion_queue" {
-  name = var.sqs_queue_name
+  count = var.enable_sqs_trigger ? 1 : 0
+  name  = var.sqs_queue_name
 }
 
 data "aws_iam_policy_document" "assume_role" {
@@ -44,8 +46,8 @@ resource "aws_iam_policy" "lambda_s3_policy" {
           "s3:ListBucket"
         ]
         Resource = [
-          data.aws_s3_bucket.ticket_ingestion_bucket.arn,
-          "${data.aws_s3_bucket.ticket_ingestion_bucket.arn}/*"
+          data.aws_s3_bucket.ticket_ingestion_bucket[0].arn,
+          "${data.aws_s3_bucket.ticket_ingestion_bucket[0].arn}/*"
         ]
       }
     ]
@@ -71,7 +73,7 @@ resource "aws_iam_policy" "lambda_sqs_policy" {
       {
         Effect   = "Allow"
         Action   = ["sqs:ReceiveMessage", "sqs:DeleteMessage", "sqs:GetQueueAttributes"]
-        Resource = [data.aws_sqs_queue.ticket_ingestion_queue.arn]
+        Resource = [data.aws_sqs_queue.ticket_ingestion_queue[0].arn]
       }
     ]
   })
@@ -109,7 +111,7 @@ resource "aws_lambda_function" "lambda_function" {
 
 resource "aws_lambda_event_source_mapping" "sqs_trigger" {
   count            = var.enable_sqs_trigger ? 1 : 0
-  event_source_arn = data.aws_sqs_queue.ticket_ingestion_queue.arn
+  event_source_arn = data.aws_sqs_queue.ticket_ingestion_queue[0].arn
   function_name    = aws_lambda_function.lambda_function.arn
   batch_size       = var.sqs_batch_size
   enabled          = true
