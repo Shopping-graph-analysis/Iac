@@ -1,0 +1,47 @@
+name: 'Terraform SSM'
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - 'ssm/*'
+      - '.github/workflows/tf-ssm.yaml'
+  workflow_dispatch:
+
+permissions:
+  id-token: write
+  contents: read
+
+
+jobs:
+  tf-ssm:
+    name: 'Terraform SSM'
+    runs-on: ubuntu-latest
+    steps:
+      - name: 'Checkout repository'
+        uses: actions/checkout@v4
+      
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v5.0.0
+        with:
+          aws-region: ${{ vars.REGION }}
+          role-to-assume: ${{ vars.OIDC_ROLE }}
+          role-session-name: IAM-Github-Actions-TF
+
+      - name: HashiCorp - Setup Terraform
+        uses: hashicorp/setup-terraform@v2.0.3
+        with:
+          terraform_version: v1.13.2
+
+      - name: 'Terraform Init'
+        working-directory: ssm
+        run: terraform init
+      
+      - name: 'Terraform Plan'
+        working-directory: ssm
+        run: terraform plan
+
+      - name: 'Terraform Apply'
+        working-directory: ssm
+        run: terraform apply -auto-approve -var "neo4j_uri=${{ secrets.NEO4J_URI }}" -var "neo4j_user=${{ secrets.NEO4J_USER }}" -var "neo4j_password=${{ secrets.NEO4J_PASSWORD }}"

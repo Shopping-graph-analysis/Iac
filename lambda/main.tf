@@ -3,6 +3,17 @@ data "archive_file" "lambda" {
   source_file = "${path.module}/main.py"
   output_path = "${path.module}/lambda_function.zip"
 }
+data "aws_ssm_parameter" "neo4j_uri" {
+  name = "/ticket/neo4j/uri"
+}
+
+data "aws_ssm_parameter" "neo4j_user" {
+  name = "/ticket/neo4j/user"
+}
+
+data "aws_ssm_parameter" "neo4j_password" {
+  name = "/ticket/neo4j/password"
+}
 
 module "event_processor_lambda" {
   source = "../modules/lambda"
@@ -23,8 +34,11 @@ module "event_processor_lambda" {
   s3_bucket_name   = "s3-ticket-storage"
 
   env_variables = {
-    ENVIRONMENT = "dev"
-    BUCKET_NAME = "s3-ticket-storage"
+    ENVIRONMENT    = "dev"
+    BUCKET_NAME    = "s3-ticket-storage"
+    NEO4J_URI      = data.aws_ssm_parameter.neo4j_uri.value
+    NEO4J_USER     = data.aws_ssm_parameter.neo4j_user.value
+    NEO4J_PASSWORD = data.aws_ssm_parameter.neo4j_password.value
   }
 
 }
