@@ -7,7 +7,7 @@ terraform {
   }
   backend "s3" {
     bucket       = "tfstate-aws-shopping-graph-analysis"
-    key          = "lambda/lambda.tfstate"
+    key          = "ssm/ssm.tfstate"
     region       = "eu-west-1"
     use_lockfile = true
   }
