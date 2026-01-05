@@ -40,8 +40,12 @@ jobs:
       
       - name: 'Terraform Plan'
         working-directory: ssm
-        run: terraform plan
+        run: terraform plan -out=tfplan
+        env:
+          TF_VAR_neo4j_uri: ${{ secrets.NEO4J_URI }}
+          TF_VAR_neo4j_user: ${{ secrets.NEO4J_USER }}
+          TF_VAR_neo4j_password: ${{ secrets.NEO4J_PASSWORD }}
 
       - name: 'Terraform Apply'
         working-directory: ssm
-        run: terraform apply -auto-approve -var neo4j_uri=${{ secrets.NEO4J_URI }} -var neo4j_user=${{ secrets.NEO4J_USER }} -var neo4j_password=${{ secrets.NEO4J_PASSWORD }}
+        run: terraform apply -auto-approve tfplan

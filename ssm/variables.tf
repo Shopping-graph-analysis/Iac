@@ -1,11 +1,14 @@
 variable "neo4j_uri" {
-  type = string
+  type      = string
+  sensitive = true
 }
 
 variable "neo4j_user" {
-  type = string
+  type      = string
+  sensitive = true
 }
 
 variable "neo4j_password" {
-  type = string
+  type      = string
+  sensitive = true
 }
