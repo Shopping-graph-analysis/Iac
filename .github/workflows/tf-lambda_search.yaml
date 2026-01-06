@@ -8,6 +8,12 @@ on:
       - 'lambda_search/*'
       - '.github/workflows/tf-lambda_search.yaml'
   workflow_dispatch:
+    inputs:
+      destroy:
+        description: 'Destroy resources?'
+        required: true
+        default: 'false'
+        type: boolean  
 
 permissions:
   id-token: write
@@ -15,7 +21,7 @@ permissions:
 
 
 jobs:
-  tf-lambda:
+  tf-lambda_search:
     name: 'Terraform Lambda Search'
     runs-on: ubuntu-latest
     steps:
@@ -40,8 +46,50 @@ jobs:
       
       - name: 'Terraform Plan'
         working-directory: lambda_search
-        run: terraform plan
+        run: |
+          if [ "${{ github.event.inputs.destroy }}" == "true" ]; then
+            terraform plan -destroy -input=false -out=tfplan
+          else
+            terraform plan -input=false -out=tfplan
+          fi
+
+      - name: 'Upload Terraform Plan'
+        uses: actions/upload-artifact@v4
+        with:
+          name: tfplan
+          path: lambda_search/tfplan
+
+  tf-lambda_search-apply:
+    needs: tf-lambda_search
+    name: 'Terraform Apply'
+    runs-on: ubuntu-latest
+    environment: production
+    steps:
+      - name: 'Checkout repository'
+        uses: actions/checkout@v4
+      
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v5.0.0
+        with:
+          aws-region: ${{ vars.REGION }}
+          role-to-assume: ${{ vars.OIDC_ROLE }}
+          role-session-name: IAM-Github-Actions-TF
+
+      - name: HashiCorp - Setup Terraform
+        uses: hashicorp/setup-terraform@v2.0.3
+        with:
+          terraform_version: v1.13.2
+
+      - name: 'Terraform Init'
+        working-directory: lambda_search
+        run: terraform init
+
+      - name: 'Download Terraform Plan'
+        uses: actions/download-artifact@v4
+        with:
+          name: tfplan
+          path: lambda_search
 
       - name: 'Terraform Apply'
         working-directory: lambda_search
-        run: terraform apply -auto-approve
+        run: terraform apply -auto-approve tfplan
