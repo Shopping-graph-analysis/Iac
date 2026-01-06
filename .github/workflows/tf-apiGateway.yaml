@@ -45,7 +45,7 @@ jobs:
         run: terraform init
       
       - name: 'Terraform Plan'
-        working-directory: s3
+        working-directory: apiGateway
         run: |
           if [ "${{ github.event.inputs.destroy }}" == "true" ]; then
             terraform plan -destroy -input=false -out=tfplan
