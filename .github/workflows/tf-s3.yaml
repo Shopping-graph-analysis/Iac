@@ -8,6 +8,12 @@ on:
       - 's3/*'
       - '.github/workflows/tf-s3.yaml'
   workflow_dispatch:
+    inputs:
+      destroy:
+        description: 'Destroy resources?'
+        required: true
+        default: 'false'
+        type: boolean  
 
 permissions:
   id-token: write
@@ -40,8 +46,51 @@ jobs:
       
       - name: 'Terraform Plan'
         working-directory: s3
-        run: terraform plan
+        run: |
+          if [ "${{ github.event.inputs.destroy }}" == "true" ]; then
+            terraform plan -destroy -input=false -out=tfplan
+          else
+            terraform plan -input=false -out=tfplan
+          fi
+
+      - name: 'Upload Terraform Plan'
+        uses: actions/upload-artifact@v4
+        with:
+          name: tfplan
+          path: s3/tfplan
+
+
+  tf-s3-apply:
+    needs: tf-s3
+    name: 'Terraform Apply'
+    runs-on: ubuntu-latest
+    environment: production
+    steps:
+      - name: 'Checkout repository'
+        uses: actions/checkout@v4
+      
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v5.0.0
+        with:
+          aws-region: ${{ vars.REGION }}
+          role-to-assume: ${{ vars.OIDC_ROLE }}
+          role-session-name: IAM-Github-Actions-TF
+
+      - name: HashiCorp - Setup Terraform
+        uses: hashicorp/setup-terraform@v2.0.3
+        with:
+          terraform_version: v1.13.2
+
+      - name: 'Terraform Init'
+        working-directory: s3
+        run: terraform init
+
+      - name: 'Download Terraform Plan'
+        uses: actions/download-artifact@v4
+        with:
+          name: tfplan
+          path: s3
 
       - name: 'Terraform Apply'
         working-directory: s3
-        run: terraform apply -auto-approve
+        run: terraform apply -auto-approve tfplan
