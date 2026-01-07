@@ -4,7 +4,7 @@ Este repositorio contiene la definición de la infraestructura como código (IaC
 
 ## Arquitectura del Sistema
 
-![Architecture Diagram](architecture.png)
+![Architecture Diagram](diagram.png)
 
 El sistema utiliza una arquitectura **Event-Driven** para procesar la ingesta de datos y **Neo4j** para el análisis de grafos, todo desplegado de forma segura en AWS.
 
