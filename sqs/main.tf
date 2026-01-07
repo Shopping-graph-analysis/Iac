@@ -15,6 +15,13 @@ locals {
   }
 }
 
+module "ticket_ingestion_dlq" {
+  source = "../modules/sqs"
+
+  queue_name = "ticket-ingestion-dlq"
+  tags       = local.common_tags
+}
+
 
 module "ticket_ingestion_queue" {
   source = "../modules/sqs"
@@ -29,4 +36,7 @@ module "ticket_ingestion_queue" {
   s3_bucket_name         = "s3-ticket-storage"
 
   tags = local.common_tags
+
+  dlq_arn           = module.ticket_ingestion_dlq.queue_arn
+  max_receive_count = 3
 }

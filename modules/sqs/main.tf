@@ -9,13 +9,17 @@ resource "aws_sqs_queue" "this" {
   message_retention_seconds = var.message_retention_seconds
   receive_wait_time_seconds = var.receive_wait_time_seconds
   tags                      = var.tags
+  redrive_policy = var.dlq_arn != null ? jsonencode({
+    deadLetterTargetArn = var.dlq_arn
+    maxReceiveCount     = var.max_receive_count
+  }) : null
 }
 
 resource "aws_sqs_queue_policy" "this" {
-  count     = var.enable_s3_notification ? 1 : 0
+  count     = var.enable_s3_notification || var.policy != null ? 1 : 0
   queue_url = aws_sqs_queue.this.id
 
-  policy = jsonencode({
+  policy = var.policy != null ? var.policy : jsonencode({
     Version = "2012-10-17"
     Statement = [
       {

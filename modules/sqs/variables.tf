@@ -44,3 +44,21 @@ variable "s3_bucket_name" {
   type        = string
   default     = ""
 }
+
+variable "dlq_arn" {
+  description = "ARN of the dead letter queue"
+  type        = string
+  default     = null
+}
+
+variable "max_receive_count" {
+  description = "The number of times a message is delivered to the source queue before being moved to the dead-letter queue"
+  type        = number
+  default     = 5
+}
+
+variable "policy" {
+  description = "The JSON policy for the SQS queue"
+  type        = string
+  default     = null
+}
