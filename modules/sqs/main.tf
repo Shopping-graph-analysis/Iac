@@ -1,4 +1,5 @@
 data "aws_s3_bucket" "ticket_ingestion_bucket" {
+  count  = var.enable_s3_notification ? 1 : 0
   bucket = var.s3_bucket_name
 }
 
